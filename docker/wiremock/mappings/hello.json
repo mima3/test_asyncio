@@ -1,0 +1,9 @@
+{
+  "request": { "method": "GET", "urlPathTemplate": "/hello/{id}" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "delayDistribution": { "type": "uniform", "lower": 1000, "upper": 4000 },
+    "bodyFileName": "hello-body.json"
+  }
+}

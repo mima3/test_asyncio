@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+tqdm = "*"
+SQLAlchemy = ">=2.0.43"
+asyncpg = ">=0.30.0"
+asyncmy = ">=0.2.10"
+httpx = ">=0.28.1"
+
+[dev-packages]
+flake8 = "*"
+black = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pyright = "*"
+
+
+[requires]
+python_version = "3.13"
+
+[scripts]
+lint = "flake8 . --ignore=E203,E501,W503,W504"
+fix = "black . --line-length=128"
+test = "pytest --cov=src --cov-report=html"

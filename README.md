@@ -16,9 +16,9 @@ macOS 15.4.1
 
 ## 事前知識
 
- - [A Conceptual Overview of asyncio](https://docs.python.org/ja/3.13/howto/a-conceptual-overview-of-asyncio.html#a-conceptual-overview-of-asyncio)
- - [import asyncio: Learn Python's](https://www.youtube.com/watch?v=Xbl7XjFYsN4&list=PLhNSoGM2ik6SIkVGXWBwerucXjgP1rHmB)
- - [Python Concurrency with asyncio](https://www.amazon.co.jp/dp/1617298662)
+- [A Conceptual Overview of asyncio](https://docs.python.org/ja/3.13/howto/a-conceptual-overview-of-asyncio.html#a-conceptual-overview-of-asyncio)
+- [import asyncio: Learn Python's](https://www.youtube.com/watch?v=Xbl7XjFYsN4&list=PLhNSoGM2ik6SIkVGXWBwerucXjgP1rHmB)
+- [Python Concurrency with asyncio](https://www.amazon.co.jp/dp/1617298662)
 
 ## 実験対象のダミーの外部リソースの起動
 
@@ -27,6 +27,15 @@ cd docker
 # 開始時
 docker compose up
 ```
+
+- postgres
+  - postgres16のDBコンテナを起動する
+- mysql
+  - mysql8のDBコンテナを起動する
+- wiremock
+  - ダミーのRESTAPIを提供するサーバーを作る
+  - GET /hello/{id} で値を返す
+    - レスポンス時間は1秒から4秒
 
 ## 実験環境のPython環境の構築
 
@@ -44,7 +53,23 @@ cd py313
 pipenv --rm
 ```
 
+### REST APIの実行の実験
+
+**httpxを使用してREST APIを実行するサンプル**
+
+```
+pipenv run python rest/test_httpx.py
+```
+
 ### Databaseの非同期の実験
+この試験はMySQLとPostgressに同時に操作を行う実験になっています。
+
+使用ライブラリ
+- SQLAlchemy
+- [asyncpg](https://github.com/MagicStack/asyncpg)
+  - Postgressの非同期ライブラリ
+- [asyncmy](https://github.com/long2ice/asyncmy)
+  - MySQLの非同期ライブラリ。[aiomysql](https://github.com/aio-libs/aiomysql)もあるが最終コミットが2023年
 
 **dbを構築**
 

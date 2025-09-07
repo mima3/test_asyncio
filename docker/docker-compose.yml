@@ -34,3 +34,14 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+
+  wiremock:
+    image: wiremock/wiremock:3.13.1   # バージョンは固定推奨
+    container_name: wiremock
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+      - ./wiremock/__files:/home/wiremock/__files
+    # ログを見たいときは ↓ を追加（任意）
+    entrypoint: ["/docker-entrypoint.sh", "--global-response-templating", "--verbose"]

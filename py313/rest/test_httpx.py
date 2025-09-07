@@ -1,18 +1,14 @@
 import asyncio
 import httpx
 import time
-
-
-prefix = "http://127.0.0.1:8080/hello"
-url_list: list[str] = []
-for i in range(100):
-    url_list.append(f"{prefix}/{i}")
+import threading
+from data import get_url_list
 
 
 async def fetch(client: httpx.AsyncClient, url: str, sem: asyncio.Semaphore):
     async with sem:
         try:
-            print(f"start get.... {url}")
+            print(f"start get.... thread_id:{threading.get_ident()} {url}")
             r = await client.get(url)  # タイムアウトはここで発生
             r.raise_for_status()  # 4xx/5xx を例外化
             body = r.json() if r.headers.get("content-type", "").startswith("application/json") else r.text
@@ -38,6 +34,7 @@ async def fetch(client: httpx.AsyncClient, url: str, sem: asyncio.Semaphore):
 
 
 async def main():
+    print(f"start thread_id:{threading.get_ident()}")
     t0 = time.perf_counter()
     limits = httpx.Limits(max_connections=20, max_keepalive_connections=20)
     timeout = httpx.Timeout(3.0)
@@ -45,7 +42,7 @@ async def main():
 
     result = []
     async with httpx.AsyncClient(http2=False, timeout=timeout, limits=limits) as client:
-        tasks = [asyncio.create_task(fetch(client, u, sem)) for u in url_list]
+        tasks = [asyncio.create_task(fetch(client, u, sem)) for u in get_url_list()]
         for item in await asyncio.gather(*tasks):
             result.append(item)
 

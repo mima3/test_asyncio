@@ -55,7 +55,8 @@ pipenv --rm
 
 ### REST APIの実行の実験
 
-**httpxを使用してREST APIを実行するサンプル**
+**httpxを使用してREST APIを実行するサンプル**  
+
 このサンプルはhttpxを非同期に実行するサンプルです。
 同時実行数は10で制限しています。
 
@@ -63,14 +64,16 @@ pipenv --rm
 pipenv run python rest/test_httpx.py
 ```
 
-**requestsを同期的に実行するサンプル**
+**requestsを同期的に実行するサンプル**  
+
 このサンプルはrequestsを同期的にに実行するサンプルです。
 
 ```
 pipenv run python rest/test_requests_sync.py
 ```
 
-**requestsを非同期的に実行するサンプル**
+**requestsを非同期的に実行するサンプル**  
+
 このサンプルは同期的に動くrequestsをasyncio.to_threadを用いて非同期的に動作させるサンプルです。
 同時実行数は10で制限しています。
 
@@ -88,20 +91,20 @@ pipenv run python rest/test_requests_async.py
 - [asyncmy](https://github.com/long2ice/asyncmy)
   - MySQLの非同期ライブラリ。[aiomysql](https://github.com/aio-libs/aiomysql)もあるが最終コミットが2023年
 
-**dbを構築**
+**dbを構築**  
 
 ```py
 pipenv run python -m db.init_db
 ```
 
 
-**クエリの実験**
+**クエリの実験**  
 
 ```
 pipenv run python -m db.query_db
 ```
 
-**dbを削除**
+**dbを削除**  
 
 ```py
 pipenv run python db.truncate_db

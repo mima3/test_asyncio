@@ -55,15 +55,6 @@ pipenv --rm
 
 ### REST APIの実行の実験
 
-**httpxを使用してREST APIを実行するサンプル**  
-
-このサンプルはhttpxを非同期に実行するサンプルです。
-同時実行数は10で制限しています。
-
-```
-pipenv run python rest/test_httpx.py
-```
-
 **requestsを同期的に実行するサンプル**  
 
 このサンプルはrequestsを同期的にに実行するサンプルです。
@@ -74,12 +65,22 @@ pipenv run python rest/test_requests_sync.py
 
 **requestsを非同期的に実行するサンプル**  
 
-このサンプルは同期的に動くrequestsをasyncio.to_threadを用いて非同期的に動作させるサンプルです。
+このサンプルは同期的に動くrequestsをasyncio.to_threadを用いて非同期的に動作させるサンプルです。  
 同時実行数は10で制限しています。
 
 ```
 pipenv run python rest/test_requests_async.py
 ```
+
+**httpxを使用してREST APIを実行するサンプル**  
+
+このサンプルは[httpx](https://github.com/encode/httpx)を非同期に実行するサンプルです。  
+httpx を使うとスレッド管理が不要になり、requestsに近い開発体験になります。
+
+```
+pipenv run python rest/test_httpx.py
+```
+
 
 ### Databaseの非同期の実験
 この試験はMySQLとPostgressに同時に操作を行う実験になっています。
@@ -108,4 +109,20 @@ pipenv run python -m db.query_db
 
 ```py
 pipenv run python db.truncate_db
+```
+
+### SSHのファイル送受信の非同期処理
+
+このサンプルはSSHサーバーとのファイルの送受信を実施するサンプルとなります。
+
+使用ライブラリ
+- [AsyncSSH](https://asyncssh.readthedocs.io/en/latest/index.html)
+
+
+**ファイルの送受信のテスト**
+
+ファイルをSSHからダウンロード後、追記を行いアップロードしなおす。
+
+```
+pipenv run python ssh/test_ssh.py
 ```

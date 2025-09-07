@@ -36,12 +36,28 @@ services:
       retries: 30
 
   wiremock:
-    image: wiremock/wiremock:3.13.1   # バージョンは固定推奨
+    image: wiremock/wiremock:3.13.1
     container_name: wiremock
     ports:
       - "8080:8080"
     volumes:
       - ./wiremock/mappings:/home/wiremock/mappings
       - ./wiremock/__files:/home/wiremock/__files
-    # ログを見たいときは ↓ を追加（任意）
     entrypoint: ["/docker-entrypoint.sh", "--global-response-templating", "--verbose"]
+
+  ssh_server:
+    image: lscr.io/linuxserver/openssh-server
+    container_name: ssh_server
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - USER_NAME=test_user
+      - PASSWORD_ACCESS=true
+      - USER_PASSWORD=pass
+      - SUDO_ACCESS=false
+    ports:
+      - "2222:2222"
+    volumes:
+      - ./ssh/uploads:/home/test_user/uploads
+      - ./ssh/downloads:/home/test_user/downloads

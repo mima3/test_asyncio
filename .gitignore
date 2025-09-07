@@ -5,3 +5,7 @@ __pycache__
 .dccache
 .scannerwork
 *.pem
+docker/ssh/uploads/*
+!docker/ssh/uploads/.gitkeep
+py313/tmp/*
+!py313/tmp/.gitkeep

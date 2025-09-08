@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from .db import get_session
 from .models import User, Post
+from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
 
 async def counts(session: AsyncSession, label: str):
@@ -93,4 +94,6 @@ async def main():
 
 
 if __name__ == "__main__":
+    install_profile_hooks()
     asyncio.run(main())
+    uninstall_profile_hooks()

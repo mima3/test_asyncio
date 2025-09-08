@@ -61,3 +61,20 @@ services:
     volumes:
       - ./ssh/uploads:/home/test_user/uploads
       - ./ssh/downloads:/home/test_user/downloads
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack_main
+    ports:
+      - "4566-4599:4566-4599"
+    environment:
+      - TZ=Asia/Tokyo
+      - DEFAULT_REGION=ap-northeast-1
+      - SERVICES=s3,sqs,dynamodb
+      - DYNAMODB_SHARE_DB=1 
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./localstack/init-scripts:/etc/localstack/init/ready.d

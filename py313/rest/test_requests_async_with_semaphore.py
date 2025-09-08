@@ -45,24 +45,26 @@ def fetch_sync(url: str, timeout: float = 3.0):
         return {"url": url, "success": False, "status": None, "body": None, "error": "timeout:" + str(e)}
 
 
-async def fetch(url: str, timeout: float):
-    print(f"start fetch.... thread_id:{threading.get_ident()} {url}")
-    # to_threadは内部でrun_in_executorを読んでいます。
-    # ここでconcurrent.futures.ThreadPoolExecutorがでてきます。
-    # これを確認するとmin(32, (os.process_cpu_count() or 1) + 4)のワーカースレッドを作っていることがわかります。
-    # asyncio.to_threadで指定した関数は上記の空いているスレッドで動作します
-    # https://github.com/python/cpython/blob/main/Lib/asyncio/threads.py
-    # https://github.com/python/cpython/blob/main/Lib/asyncio/base_events.py#L884
-    # https://github.com/python/cpython/blob/main/Lib/concurrent/futures/thread.py#L150
-    return await asyncio.to_thread(fetch_sync, url, timeout)
+async def fetch(url: str, sem: asyncio.Semaphore, timeout: float):
+    async with sem:
+        print(f"start fetch.... thread_id:{threading.get_ident()} {url}")
+        # to_threadは内部でrun_in_executorを読んでいます。
+        # ここでconcurrent.futures.ThreadPoolExecutorがでてきます。
+        # これを確認するとmin(32, (os.process_cpu_count() or 1) + 4)のワーカースレッドを作っていることがわかります。
+        # asyncio.to_threadで指定した関数は上記の空いているスレッドで動作します
+        # https://github.com/python/cpython/blob/main/Lib/asyncio/threads.py
+        # https://github.com/python/cpython/blob/main/Lib/asyncio/base_events.py#L884
+        # https://github.com/python/cpython/blob/main/Lib/concurrent/futures/thread.py#L150
+        return await asyncio.to_thread(fetch_sync, url, timeout)
 
 
 async def main():
     print(f"start thread_id:{threading.get_ident()}")
     timeout = 3.0
+    sem = asyncio.Semaphore(5)  # 同時実行上限（必要に応じて調整）
 
     try:
-        result = await asyncio.gather(*(fetch(u, timeout) for u in get_url_list()))
+        result = await asyncio.gather(*(fetch(u, sem, timeout) for u in get_url_list()))
     finally:
         close_all_sessions()
 

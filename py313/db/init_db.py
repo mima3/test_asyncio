@@ -2,6 +2,7 @@ import asyncio
 from sqlalchemy.ext.asyncio import AsyncEngine
 from .db import engine_pg, engine_mysql, get_session
 from .models import Base, User, Post
+from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
 
 async def create_all(engine: AsyncEngine, label: str):
@@ -41,4 +42,6 @@ async def main():
 
 
 if __name__ == "__main__":
+    install_profile_hooks()
     asyncio.run(main())
+    uninstall_profile_hooks()

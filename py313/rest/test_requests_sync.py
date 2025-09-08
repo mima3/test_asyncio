@@ -1,7 +1,7 @@
-import time
 import requests
 import threading
-from data import get_url_list
+from .data import get_url_list
+from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
 
 def fetch_sync(url: str, timeout: float = 3.0):
@@ -19,7 +19,6 @@ def fetch_sync(url: str, timeout: float = 3.0):
 
 def main():
     print(f"start thread_id:{threading.get_ident()}")
-    t0 = time.perf_counter()
     result = []
     for url in get_url_list():
         res = fetch_sync(url, 3.0)
@@ -27,8 +26,9 @@ def main():
     for item in result:
         print(item)
     print("result...", len(result))
-    print(f"done in {time.perf_counter() - t0:.3f}s")
 
 
 if __name__ == "__main__":
+    install_profile_hooks()
     main()
+    uninstall_profile_hooks()

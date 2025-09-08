@@ -11,6 +11,10 @@ asyncmy = ">=0.2.10"
 httpx = ">=0.28.1"
 requests = ">=2.32.5"
 asyncssh = ">=2.21.0"
+aioboto3 = "==15.1.0"
+"aiobotocore[boto3]" = "==2.24.0"
+aiofiles = ">=23.2.1"
+aiometer = "==1.*"
 
 [dev-packages]
 flake8 = "*"
@@ -19,7 +23,6 @@ pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
 pyright = "*"
-
 
 [requires]
 python_version = "3.13"

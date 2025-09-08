@@ -3,6 +3,7 @@ import os
 import posixpath
 import asyncssh
 from datetime import datetime
+from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
 HOST = "127.0.0.1"
 PORT = 2222
@@ -119,4 +120,6 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    install_profile_hooks()
     asyncio.run(main())
+    uninstall_profile_hooks()

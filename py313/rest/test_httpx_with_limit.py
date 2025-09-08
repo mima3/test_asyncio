@@ -1,6 +1,8 @@
 import asyncio
 import httpx
 import threading
+import aiometer
+import functools
 from .data import get_url_list
 from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
@@ -39,10 +41,14 @@ async def main():
 
     result = []
     async with httpx.AsyncClient(http2=False, timeout=timeout, limits=limits) as client:
-        tasks = [asyncio.create_task(fetch(client, u)) for u in get_url_list()]
-        for item in await asyncio.gather(*tasks):
-            result.append(item)
-
+        async with aiometer.amap(
+            functools.partial(fetch, client),
+            get_url_list(),
+            max_at_once=5,  # これは、特定の時点で同時に実行されるタスクの最大数を制限するために使用されます。(100 個のタスクがあり、 を設定するとmax_at_once=10、aiometer同時に実行されるタスクが 10 個以下になります。)
+            max_per_second=2,  # このオプションは、1秒あたりに生成されるタスクの数を制限します。これは、レート制限ポリシーが適用されているサーバーなど、I/Oリソースの過負荷を防ぐのに役立ちます。
+        ) as items:
+            async for item in items:
+                result.append(item)
     for item in result:
         print(item)
     print("result...", len(result))

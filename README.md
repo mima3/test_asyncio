@@ -59,6 +59,26 @@ pipenv --rm
 
 ## 実験内容
 
+### 最も単純な例
+
+**直列の例**
+
+```bash
+time pipenv run python -m basic.test_simple_001
+```
+
+**gatherによる並列の例**
+
+```bash
+time pipenv run python -m basic.test_simple_002
+```
+
+**TaskGroupによる並列の例**
+
+```bash
+time pipenv run python -m basic.test_simple_003
+```
+
 ### gather vs TaskGroup
 
 asyncioの並行実行には[gather](https://docs.python.org/ja/3.13/library/asyncio-task.html#asyncio.gather)で並行実行する方法と、[TaskGrou](https://docs.python.org/ja/3.13/library/asyncio-task.html#asyncio.TaskGroup)による実行方法があります。

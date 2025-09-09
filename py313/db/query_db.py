@@ -90,7 +90,9 @@ async def run_for(db_label: str):
 
 async def main():
     # Run both DBs concurrently to demonstrate asyncio usage
-    await asyncio.gather(run_for("PostgreSQL"), run_for("MySQL"))
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(run_for("PostgreSQL"))
+        tg.create_task(run_for("MySQL"))
 
 
 if __name__ == "__main__":

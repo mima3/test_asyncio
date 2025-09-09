@@ -98,25 +98,29 @@ async def main() -> None:
         known_hosts=None,
     ) as conn:
         download_tasks = []
-        for remote_path, local_path in download_list:
-            download_tasks.append(asyncio.create_task(sftp_get(conn, remote_path, local_path, sem)))
+        async with asyncio.TaskGroup() as tg:
+            for remote_path, local_path in download_list:
+                download_tasks.append(tg.create_task(sftp_get(conn, remote_path, local_path, sem)))
         # 失敗も回収してログに出す
         upload_tasks = []
-        downloads = await asyncio.gather(*download_tasks)
-        for i, item in enumerate(downloads):
-            if not item:
-                print(f"[ERR ] task#{i}: {item!r}")
-            else:
-                local_path: str = item
-                with open(item, "a") as f:
-                    print(f"{datetime.now()} appended", file=f)
-                upload_tasks.append(
-                    asyncio.create_task(sftp_put(conn, item, f"/home/test_user/uploads/upload_{i + 1:04d}.md", sem))
-                )
-        uploads = await asyncio.gather(*upload_tasks, return_exceptions=True)
+        downloads = [task.result() for task in download_tasks]
+        async with asyncio.TaskGroup() as tg:
+            for i, item in enumerate(downloads):
+                if not item:
+                    print(f"[ERR ] task#{i}: {item!r}")
+                else:
+                    local_path: str = item
+                    with open(item, "a") as f:
+                        print(f"{datetime.now()} appended", file=f)
+                    upload_tasks.append(
+                        tg.create_task(sftp_put(conn, item, f"/home/test_user/uploads/upload_{i + 1:04d}.md", sem))
+                    )
+        uploads = [task.result() for task in upload_tasks]
         for i, item in enumerate(uploads):
             if isinstance(item, Exception):
                 print(f"[ERR ] task#{i}: {item!r}")
+            else:
+                print(f"[OK  ] task#{i}:")
 
 
 if __name__ == "__main__":

@@ -60,6 +60,7 @@ async def upload_files_to_s3(
         ),
     )
     async with s3_cm as s3:
+
         async def put_one(path: Path):
             # S3 の Key を決める（prefix + ファイル名）
             rel = path.name
@@ -80,7 +81,9 @@ async def upload_files_to_s3(
             )
             results.append({"file": str(path), "key": key, "status": "uploaded"})
 
-        await asyncio.gather(*(put_one(p) for p in file_list))
+        async with asyncio.TaskGroup() as tg:
+            for p in file_list:
+                tg.create_task(put_one(p))
 
     return results
 

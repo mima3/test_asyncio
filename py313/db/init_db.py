@@ -31,14 +31,15 @@ async def make_init_data(db_label: str):
 
 
 async def main():
-    await asyncio.gather(
-        create_all(engine_pg, "PostgreSQL"),
-        create_all(engine_mysql, "MySQL"),
-    )
-    await asyncio.gather(
-        make_init_data("PostgreSQL"),
-        make_init_data("MySQL"),
-    )
+    # Phase 1: 両DBのスキーマ作成を並行→完了まで待つ
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(create_all(engine_pg, "PostgreSQL"))
+        tg.create_task(create_all(engine_mysql, "MySQL"))
+
+    # Phase 2: 初期データ投入を並行→完了まで待つ
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(make_init_data("PostgreSQL"))
+        tg.create_task(make_init_data("MySQL"))
 
 
 if __name__ == "__main__":

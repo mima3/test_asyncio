@@ -9,6 +9,7 @@ TaskGroup vs gather
 - 複数同時失敗を正しく扱いたい（集約して上げたい） → TaskGroup（ExceptionGroup）
 - 例外も“値”として扱いたい（失敗しても進めたい） → gather(return_exceptions=True)
 - 3.10 以前でも動かしたい → gather
+- グループをネストさせたい → TaskGroup
 """
 
 
@@ -88,12 +89,16 @@ async def demo_gather_failure_default():
         res = await asyncio.gather(
             ok("OK", 0.1),
             boom("BAD", 0.20),
-            sleepy("SLOW", 2.00),  # キャンセルされる
-            sleepy("SLOW2", 2.00),  # キャンセルされる
+            sleepy("SLOW", 2.00),  # キャンセルされない
+            sleepy("SLOW2", 2.00),  # キャンセルされない
         )
+        # 実行されないはず
         print("demo_gather_failure_default result:", res)
     except Exception as e:
         print("gather raised:", type(e).__name__, e)
+    print("--------------------- asyncio.gatherが終わったあとの実行")
+    await asyncio.sleep(3.0)
+    print("-----------------------------------------------------")
 
 
 # 5) gather（return_exceptions=True）：例外を結果として返し、基本キャンセルしない
@@ -111,12 +116,41 @@ async def demo_gather_return_exceptions():
     print("results:", norm)
 
 
+# 6) TaskGroupのネストの確認
+async def demo_taskgroup_nest():
+    print("\n--- demo_taskgroup_nest ---")
+
+    async def make_groupA():
+        print("start---- make_groupA")
+        async with asyncio.TaskGroup() as tg:
+            t1 = tg.create_task(ok("A1", 1.00))
+            t2 = tg.create_task(ok("A2", 2.00))
+        print("end---- make_groupA")
+        return (t1.result(), t2.result())
+
+    async def make_groupB():
+        print("end---- make_groupB")
+        async with asyncio.TaskGroup() as tg:
+            t1 = tg.create_task(ok("B1", 1.30))
+            t2 = tg.create_task(ok("B2", 1.00))
+            t3 = tg.create_task(ok("B3", 1.10))
+        print("end---- make_groupB")
+        return (t1.result(), t2.result(), t3.result())
+
+    async with asyncio.TaskGroup() as outer_group:
+        g1 = outer_group.create_task(make_groupA())
+        g2 = outer_group.create_task(make_groupB())
+    print(g1.result())
+    print(g2.result())
+
+
 async def main():
     await demo_taskgroup_success()
+    await demo_taskgroup_nest()
     await demo_gather_success()
     await demo_taskgroup_failure()
-    await demo_gather_failure_default()
     await demo_gather_return_exceptions()
+    await demo_gather_failure_default()
 
 
 if __name__ == "__main__":

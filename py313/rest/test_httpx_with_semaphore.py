@@ -41,10 +41,12 @@ async def main():
 
     result = []
     async with httpx.AsyncClient(http2=False, timeout=timeout, limits=limits) as client:
-        tasks = [asyncio.create_task(fetch(client, u, sem)) for u in get_url_list()]
-        for item in await asyncio.gather(*tasks):
-            result.append(item)
-
+        tasks = []
+        async with asyncio.TaskGroup() as tg:
+            for u in get_url_list():
+                tasks.append(tg.create_task(fetch(client, u, sem)))
+        for task in tasks:
+            result.append(task.result())
     for item in result:
         print(item)
     print("result...", len(result))

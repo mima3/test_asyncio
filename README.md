@@ -57,6 +57,26 @@ cd py313
 pipenv --rm
 ```
 
+## 実験内容
+
+### gather vs TaskGroup
+
+asyncioの並行実行には[gather](https://docs.python.org/ja/3.13/library/asyncio-task.html#asyncio.gather)で並行実行する方法と、[TaskGrou](https://docs.python.org/ja/3.13/library/asyncio-task.html#asyncio.TaskGroup)による実行方法があります。
+
+以下のサンプルではその挙動の違いを実験するものとなります。
+
+```bash
+pipenv run python -m basic.test_task_group
+```
+
+### サブプロセスの実行の実験
+
+このサンプルではサブプロセスの実行を並行で動作するサンプルです。
+
+```bash
+pipenv run python -m basic.test_subprocess
+```
+
 ### REST APIの実行の実験
 
 **requestsを同期的に実行するサンプル**  
@@ -87,18 +107,31 @@ pipenv run python -m rest.test_requests_async_with_semaphore
 このサンプルは[httpx](https://github.com/encode/httpx)を非同期に実行するサンプルです。  
 httpx を使うとスレッド管理が不要になり、requestsに近い開発体験になります。
 
+**同期実行**
+
 ```
-pipenv run python -m rest.test_httpx
+pipenv run python -m rest.test_httpx_sync
 ```
 
-この際、セマフォを用いて同時実行数の上限を5として実行する場合は以下のようになります。
+**非同期実行**
+
+```
+pipenv run python -m rest.test_httpx_async
+```
+
+**同時実行数の制限**
+
+非同期実行の場合、サーバー側に与える負荷が気になるケースがあります。
+この場合は、セマフォを用いて同時実行数の上限を5として実行することもできます。
 
 ```
 pipenv run python -m rest.test_httpx_with_semaphore
 ```
 
+**秒間リクエストが限られる場合**
+
 REST APIには秒間の要求数の上限が要求されているケースがあります。
-以下の例では[aiometer](https://github.com/florimondmanca/aiometer/tree/master)を使用して秒間の要求数を絞ったものになります。
+この場合、[aiometer](https://github.com/florimondmanca/aiometer/tree/master)を使用して秒間の要求数を制限することが可能です
 
 ```
 pipenv run python -m rest.test_httpx_with_limit 

@@ -62,7 +62,13 @@ async def main():
     timeout = 3.0
 
     try:
-        result = await asyncio.gather(*(fetch(u, timeout) for u in get_url_list()))
+        tasks = []
+        result = []
+        async with asyncio.TaskGroup() as tg:
+            for u in get_url_list():
+                tasks.append(tg.create_task(fetch(u, timeout)))
+        for task in tasks:
+            result.append(task.result())
     finally:
         close_all_sessions()
 

@@ -37,8 +37,9 @@ async def truncate_mysql():
 
 
 async def main():
-    # 並列に実行
-    await asyncio.gather(truncate_postgres(), truncate_mysql())
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(truncate_postgres())
+        tg.create_task(truncate_mysql())
 
 
 if __name__ == "__main__":

@@ -64,7 +64,13 @@ async def main():
     sem = asyncio.Semaphore(5)  # 同時実行上限（必要に応じて調整）
 
     try:
-        result = await asyncio.gather(*(fetch(u, sem, timeout) for u in get_url_list()))
+        tasks = []
+        result = []
+        async with asyncio.TaskGroup() as tg:
+            for u in get_url_list():
+                tasks.append(tg.create_task(fetch(u, sem, timeout)))
+        for task in tasks:
+            result.append(task.result())
     finally:
         close_all_sessions()
 

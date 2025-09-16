@@ -19,4 +19,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    with asyncio.Runner(debug=True) as runner:
+        runner.run(main())

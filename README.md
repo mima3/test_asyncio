@@ -97,6 +97,14 @@ pipenv run python -m basic.test_task_group
 pipenv run python -m basic.test_subprocess
 ```
 
+### ファイル入出力の実験
+
+このサンプルではファイルI/Oの実行を並行で動作するサンプルです。
+
+```bash
+pipenv run python -m file.test_file
+```
+
 ### REST APIの実行の実験
 
 **requestsを同期的に実行するサンプル**  

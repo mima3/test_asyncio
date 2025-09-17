@@ -54,9 +54,8 @@ async def main():
         async with session.begin():
             stmt = select(User).order_by(User.id)
             users = await session.stream_scalars(stmt)
-            with users:
-                async for u in users:
-                    print(f"[User] #{u.id} {u.name}")
+            async for u in users:
+                print(f"[User] #{u.id} {u.name}")
 
 
 with asyncio.Runner(debug=True) as runner:

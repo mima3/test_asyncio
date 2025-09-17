@@ -18,11 +18,10 @@ async def counts(session: AsyncSession, label: str):
 async def show_posts(session: AsyncSession, label: str):
     stmt = select(User).options(selectinload(User.posts)).order_by(User.id)
     users = await session.stream_scalars(stmt)
-    with users:
-        async for u in users:
-            print(f"[{label}] User #{u.id} {u.name}")
-            for p in u.posts:
-                print(f"  └─ ({p.id}) title:{p.title} body:{p.body}")
+    async for u in users:
+        print(f"[{label}] User #{u.id} {u.name}")
+        for p in u.posts:
+            print(f"  └─ ({p.id}) title:{p.title} body:{p.body}")
 
 
 async def add_ok(session: AsyncSession, db_label: str):

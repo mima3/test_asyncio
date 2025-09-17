@@ -5,9 +5,9 @@ import uvloop
 from dataclasses import dataclass
 
 # 測定パラメータ（環境に合わせて増減）
-CONNECTIONS = 200  # 同時接続数
+CONNECTIONS = 100  # 同時接続数
 MSGS_PER_CONN = 200  # 1接続あたりの往復回数
-PAYLOAD_SIZE = 1024  # 1メッセージのバイト数
+PAYLOAD_SIZE = 2048  # 1メッセージのバイト数
 
 
 @dataclass

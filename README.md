@@ -173,7 +173,7 @@ pipenv run python -m rest.test_httpx_with_limit
 - [asyncpg](https://github.com/MagicStack/asyncpg)
   - Postgressの非同期ライブラリ
 - [asyncmy](https://github.com/long2ice/asyncmy)
-  - MySQLの非同期ライブラリ。[aiomysql](https://github.com/aio-libs/aiomysql)もあるが最終コミットが2023年
+  - MySQLの非同期ライブラリ。[aiomysql](https://github.com/aio-libs/aiomysql)もあるが最終リリースが2023年
 
 **dbを構築**  
 

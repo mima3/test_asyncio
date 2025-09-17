@@ -1,7 +1,7 @@
-# AsyncIOの検証
+# asyncioの検証
 
 ## 概要
-このリポジトリはPythonのAsyncIOの実験を行うものである
+このリポジトリはPythonのasyncioの実験を行うものである
 実験には以下が動作する環境が存在すること。
 
 - docker

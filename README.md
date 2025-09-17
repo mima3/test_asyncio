@@ -191,7 +191,7 @@ pipenv run python -m db.query_db
 **dbを削除**  
 
 ```py
-pipenv run python db.truncate_db
+pipenv run python -m db.truncate_db
 ```
 
 ### SSHのファイル送受信の非同期処理
@@ -210,6 +210,17 @@ pipenv run python db.truncate_db
 pipenv run python -m ssh.test_ssh
 ```
 
+### Redisの非同期処理
+
+通常の同期処理でも使用している[redis-py](https://pypi.org/project/redis/)を使用して非同期処理が可能です。
+
+
+```
+# 単純な実行例
+pipenv run python -m redis_sample.simple
+# プールを使用した例
+pipenv run python -m redis_sample.pool
+```
 
 ### AWSの非同期処理
 [aioboto3](https://pypi.org/project/aioboto3/)を使用してS3へのファイルアップロードのサンプルを記載します。

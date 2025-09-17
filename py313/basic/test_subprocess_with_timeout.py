@@ -31,8 +31,9 @@ async def run_and_stream(name: str, cmd: Sequence[str], timeout: float) -> int:
         # TaskGroup は正常終了時、reader が EOF を読み切るまで待ってくれる
         return proc.returncode or 0
 
-    except TimeoutError:
+    except asyncio.TimeoutError:
         if proc.returncode is None:
+            print('タイムアウトのため終了')
             proc.terminate()
             # proc.kill() ... 強制的に止めるケース
         return proc.returncode if proc.returncode is not None else 1

@@ -232,7 +232,10 @@ pipenv run python -m redis_sample.pool
 docker/ssh/downloadsにあるファイルをlocalstackのmy-bucketパケットのincomeのしたにアップロードするサンプルです。
 
 ```
-pipenv run python -m aws.test_s3_aioboto3 
+# upload
+pipenv run python -m aws.test_s3_upload 
+# パケット中のオブジェクト列挙
+pipenv run python -m aws.test_s3_listup
 ```
 
 localstackにアップロードしたファイルは以下のコマンドで確認できます。

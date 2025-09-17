@@ -8,7 +8,8 @@ class TestAsync:
     def test_sample(self):
         assert True
 
-    @pytest.mark.asyncio
+    # pytest.iniがあればでコレータは不要
+    # @pytest.mark.asyncio
     async def test_async(self):
         await asyncio.sleep(0)
         assert True

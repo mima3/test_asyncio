@@ -4,10 +4,12 @@ import aiofiles
 from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
 
-async def read_file(input_path: str) -> str:
+async def read_file(input_path: str) -> list[str]:
+    lines = []
     async with aiofiles.open(input_path, mode="r") as f:
-        contents = await f.read()
-    return contents
+        async for line in f:
+            lines.append(line)
+    return lines
 
 
 async def main():
@@ -42,7 +44,7 @@ async def main():
     for task in tasks:
         result.append(task.result())
     for item in result:
-        print(item.split("\n")[0])
+        print(item[0])
     print("result...", len(result))
 
 

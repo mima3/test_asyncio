@@ -17,12 +17,13 @@ class TestAsync:
     async def test_async_read_file(self):
         contents = await read_file("../docker/ssh/downloads/0001.md")
         print(contents)
-        assert contents.split("\n")[0] == "仏説摩訶般若波羅蜜多心経"
+        assert contents[0] == "仏説摩訶般若波羅蜜多心経\n"
 
     @pytest.mark.asyncio
     async def test_async_read_file_mock(self):
         file_obj = AsyncMock()
-        file_obj.read.return_value = "hello"
+        # file_obj.read.return_value = ["hello"]
+        file_obj.__aiter__.return_value = iter(["hello\n", "world\n"])
         cm = AsyncMock()
         cm.__aenter__.return_value = file_obj
         cm.__aexit__.return_value = None
@@ -30,4 +31,4 @@ class TestAsync:
             print(m_open)
             contents = await read_file("../docker/ssh/downloads/0001.md")
             print(contents)
-            assert contents.split("\n")[0] == "hello"
+            assert contents[0] == "hello\n"

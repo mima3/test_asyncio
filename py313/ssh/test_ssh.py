@@ -46,44 +46,36 @@ download_list = [
 ]
 
 
-async def sftp_get(conn: asyncssh.SSHClientConnection, remote: str, local: str, sem: asyncio.Semaphore) -> str:
+async def sftp_get(sftp: asyncssh.SFTPClient, remote: str, local: str, sem: asyncio.Semaphore) -> str:
     async with sem:
         # ダウンロード先のローカルにフォルダを作る
         os.makedirs(os.path.dirname(local) or ".", exist_ok=True)
 
-        # 非同期処理で動いてることがわかりやすいように時間稼ぎ
-        await asyncio.sleep(1)
-
         try:
             # ダウンロード
-            async with conn.start_sftp_client() as sftp:
-                await sftp.get(remote, local)
-                print(f"[GET ] {remote} -> {local}")
+            await sftp.get(remote, local)
+            print(f"[GET ] {remote} -> {local}")
             return local
         except (asyncssh.Error, OSError) as e:
             print(e)
             return ""
 
 
-async def sftp_put(conn: asyncssh.SSHClientConnection, local: str, remote: str, sem: asyncio.Semaphore):
+async def sftp_put(sftp: asyncssh.SFTPClient, local: str, remote: str, sem: asyncio.Semaphore):
     async with sem:
-        async with conn.start_sftp_client() as sftp:
-            # リモートパスは POSIX（/ 区切り）
-            parent_dir = posixpath.dirname(remote) or "."
+        # リモートパスは POSIX（/ 区切り）
+        parent_dir = posixpath.dirname(remote) or "."
+        try:
+            await sftp.stat(parent_dir)
+        except Exception:
+            # 無ければ掘る（既にあるときは失敗する可能性があるので try/except）
             try:
-                await sftp.stat(parent_dir)
+                await sftp.mkdir(parent_dir)
             except Exception:
-                # 無ければ掘る（既にあるときは失敗する可能性があるので try/except）
-                try:
-                    await sftp.mkdir(parent_dir)
-                except Exception:
-                    pass
+                pass
 
-            # 非同期処理で動いてることがわかりやすいように時間稼ぎ
-            await asyncio.sleep(1)
-
-            await sftp.put(local, remote)
-            print(f"[PUT ] {local} -> {remote}")
+        await sftp.put(local, remote)
+        print(f"[PUT ] {local} -> {remote}")
 
 
 async def main() -> None:
@@ -97,30 +89,31 @@ async def main() -> None:
         client_keys=[],
         known_hosts=None,
     ) as conn:
-        download_tasks = []
-        async with asyncio.TaskGroup() as tg:
-            for remote_path, local_path in download_list:
-                download_tasks.append(tg.create_task(sftp_get(conn, remote_path, local_path, sem)))
-        # 失敗も回収してログに出す
-        upload_tasks = []
-        downloads = [task.result() for task in download_tasks]
-        async with asyncio.TaskGroup() as tg:
-            for i, item in enumerate(downloads):
-                if not item:
+        async with conn.start_sftp_client() as sftp:
+            download_tasks = []
+            async with asyncio.TaskGroup() as tg:
+                for remote_path, local_path in download_list:
+                    download_tasks.append(tg.create_task(sftp_get(sftp, remote_path, local_path, sem)))
+            # 失敗も回収してログに出す
+            upload_tasks = []
+            downloads = [task.result() for task in download_tasks]
+            async with asyncio.TaskGroup() as tg:
+                for i, item in enumerate(downloads):
+                    if not item:
+                        print(f"[ERR ] task#{i}: {item!r}")
+                    else:
+                        local_path: str = item
+                        with open(item, "a") as f:
+                            print(f"{datetime.now()} appended", file=f)
+                        upload_tasks.append(
+                            tg.create_task(sftp_put(sftp, item, f"/home/test_user/uploads/upload_{i + 1:04d}.md", sem))
+                        )
+            uploads = [task.result() for task in upload_tasks]
+            for i, item in enumerate(uploads):
+                if isinstance(item, Exception):
                     print(f"[ERR ] task#{i}: {item!r}")
                 else:
-                    local_path: str = item
-                    with open(item, "a") as f:
-                        print(f"{datetime.now()} appended", file=f)
-                    upload_tasks.append(
-                        tg.create_task(sftp_put(conn, item, f"/home/test_user/uploads/upload_{i + 1:04d}.md", sem))
-                    )
-        uploads = [task.result() for task in upload_tasks]
-        for i, item in enumerate(uploads):
-            if isinstance(item, Exception):
-                print(f"[ERR ] task#{i}: {item!r}")
-            else:
-                print(f"[OK  ] task#{i}:")
+                    print(f"[OK  ] task#{i}:")
 
 
 if __name__ == "__main__":

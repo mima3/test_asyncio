@@ -79,6 +79,6 @@ async def main():
 
 if __name__ == "__main__":
     install_profile_hooks()
-    with asyncio.Runner(debug=True) as runner:
+    with asyncio.Runner(debug=False) as runner:
         runner.run(main())
     uninstall_profile_hooks()

@@ -229,3 +229,11 @@ localstackにアップロードしたファイルは以下のコマンドで確�
 ```
 curl http://localhost:4566/my-bucket/income/0010.md
 ```
+
+### 非同期を含むテストコードの実験
+
+pytest-asyncioを使用する。
+
+```bash
+pipenv run test test
+```

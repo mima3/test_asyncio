@@ -22,7 +22,6 @@ async def upload_files_to_s3(
     session = aioboto3.Session()
     results: list[dict] = []
     sem = asyncio.Semaphore(max_concurrency_file)
-
     async with session.client("s3") as s3:
 
         async def put_one(path: Path):

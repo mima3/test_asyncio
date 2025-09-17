@@ -244,6 +244,16 @@ localstackにアップロードしたファイルは以下のコマンドで確�
 curl http://localhost:4566/my-bucket/income/0010.md
 ```
 
+型チェックを行う場合、[types-aioboto3](https://pypi.org/project/types-aioboto3/)が必要になります。
+
+### uvloopの試験
+
+[uvloop](https://pypi.org/project/uvloop/)に通常のループに変更した場合のベンチマーク
+
+```
+pipenv run python -m basic.bench_uvloop_echo
+```
+
 ### 非同期を含むテストコードの実験
 
 pytest-asyncioを使用する。

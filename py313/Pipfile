@@ -14,9 +14,11 @@ requests = ">=2.32.5"
 asyncssh = ">=2.21.0"
 aioboto3 = "==15.1.0"
 "aiobotocore[boto3]" = "==2.24.0"
+"types-aioboto3[s3]" = ">=15.1.0"
 aiofiles = ">=23.2.1"
 aiometer = "==1.*"
 redis = ">=6.4.0"
+uvloop = ">=0.21.0"
 
 [dev-packages]
 flake8 = "*"

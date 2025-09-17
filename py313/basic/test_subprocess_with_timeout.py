@@ -4,7 +4,7 @@ from typing import Sequence
 from thread.watch_thread import install_profile_hooks, uninstall_profile_hooks
 
 
-async def run_and_stream(name: str, cmd: Sequence[str]) -> int:
+async def run_and_stream(name: str, cmd: Sequence[str], timeout: float) -> int:
     proc = await asyncio.create_subprocess_exec(
         *cmd,
         stdout=asyncio.subprocess.PIPE,
@@ -21,13 +21,21 @@ async def run_and_stream(name: str, cmd: Sequence[str]) -> int:
                 break
             print(f"{label} {line.decode(errors='replace').rstrip()}")
 
-    async with asyncio.TaskGroup() as tg:
-        tg.create_task(pipe_reader(stdout, f"{name} [OUT]"))
-        tg.create_task(pipe_reader(stderr, f"{name} [ERR]"))
-        # 子プロセス終了を待つ（正常終了時はここを抜ける）
-        await proc.wait()
-    # TaskGroup は正常終了時、reader が EOF を読み切るまで待ってくれる
-    return proc.returncode or 0
+    try:
+        async with asyncio.timeout(timeout):
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(pipe_reader(stdout, f"{name} [OUT]"))
+                tg.create_task(pipe_reader(stderr, f"{name} [ERR]"))
+                # 子プロセス終了を待つ（正常終了時はここを抜ける）
+                await proc.wait()
+        # TaskGroup は正常終了時、reader が EOF を読み切るまで待ってくれる
+        return proc.returncode or 0
+
+    except TimeoutError:
+        if proc.returncode is None:
+            proc.terminate()
+            # proc.kill() ... 強制的に止めるケース
+        return proc.returncode if proc.returncode is not None else 1
 
 
 async def main():
@@ -55,7 +63,7 @@ for i in range(5):
 
     # 並行に2つの子プロセスを実行（それぞれ10秒タイムアウト）
     async with asyncio.TaskGroup() as tg:
-        tasks = [tg.create_task(run_and_stream(name, cmd)) for name, cmd in cmds]
+        tasks = [tg.create_task(run_and_stream(name, cmd, timeout=1.0)) for name, cmd in cmds]
     for item, task in zip(cmds, tasks):
         print(item[0], task.result())
 

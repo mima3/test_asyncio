@@ -19,6 +19,9 @@ aiofiles = ">=23.2.1"
 aiometer = "==1.*"
 redis = ">=6.4.0"
 uvloop = ">=0.21.0"
+wove = "==1.*"
+aiomultiprocess = "==0.9.1"
+trio = "*"
 
 [dev-packages]
 flake8 = "*"

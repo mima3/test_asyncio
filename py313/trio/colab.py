@@ -6,7 +6,7 @@ async def producer(work_send: trio.MemorySendChannel[int], n: int) -> None:
         for i in range(n):
             print(f"[producer] sending work {i}")
             await work_send.send(i)
-            print(f"[producer] sended work {i}")
+            print(f"[producer] sent work {i}")
 
 
 async def worker(

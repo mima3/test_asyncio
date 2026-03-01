@@ -56,6 +56,7 @@ async def parent():
         # -- we exit the nursery block here --
     print("parent: all done!")
 
-print('start .... main')
-trio.run(parent, instruments=[Tracer()])
-print('end .... main')
+if __name__ == "__main__":
+    print('start .... main')
+    trio.run(parent, instruments=[Tracer()])
+    print('end .... main')
